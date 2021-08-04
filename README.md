@@ -41,7 +41,7 @@ TBC
 
 ## Debug messages
 All debug messages use SWV ITM (Serial Wire Viewer Instruction Trace Module). \
-This is achieved by using `__io_putchar` function overloading (weak attribute). \
+This is achieved by `_write` function overloading (weak attribute). \
 See `(Secure|NonSecure)/Core/Src/syscall.c` for the actual implementation.
 
 ## Example usage
