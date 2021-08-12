@@ -29,7 +29,7 @@ https://developer.arm.com/tools-and-software/open-source-software/developer-tool
 Pre-built toolchain for target's Arm® Cortex®-M33 core.
 
 ## Option bytes
-In order to program the target, following option bytes **MUST** be set: \
+In order to program the target, following option bytes **MUST** be set:
 - `TZEN = 1` – marking TZ (Arm® TrustZone) enabled
 - `DBANK = 1` – marking flash dual banking enabled 
 - `SECWM1_PSTRT = 0x00`, `SECWM1_PEND = 0x7F` – marking all 128 pages of Bank1 flash secured

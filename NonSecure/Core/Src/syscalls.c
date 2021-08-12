@@ -74,6 +74,7 @@ __attribute__((weak)) int _read(int file, char *ptr, int len)
 		*ptr++ = __io_getchar();
 	}
 
+
 return len;
 }
 

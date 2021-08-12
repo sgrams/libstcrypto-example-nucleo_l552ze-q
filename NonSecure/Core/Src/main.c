@@ -41,10 +41,10 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-/* Definitions for LEDThreadHandle */
-osThreadId_t LEDThreadHandleHandle;
-const osThreadAttr_t LEDThreadHandle_attributes = {
-  .name = "LEDThreadHandle",
+/* Definitions for testThreadHandl */
+osThreadId_t testThreadHandlHandle;
+const osThreadAttr_t testThreadHandl_attributes = {
+  .name = "testThreadHandl",
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 512
 };
@@ -55,7 +55,7 @@ const osThreadAttr_t LEDThreadHandle_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-void LED_Thread(void *argument);
+void TEST_Thread(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -118,8 +118,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of LEDThreadHandle */
-  LEDThreadHandleHandle = osThreadNew(LED_Thread, NULL, &LEDThreadHandle_attributes);
+  /* creation of testThreadHandl */
+  testThreadHandlHandle = osThreadNew(TEST_Thread, NULL, &testThreadHandl_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -221,14 +221,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_LED_Thread */
+/* USER CODE BEGIN Header_TEST_Thread */
 /**
-  * @brief  Function implementing the LEDThreadHandle thread.
+  * @brief  Function implementing the testThreadHandl thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_LED_Thread */
-void LED_Thread(void *argument)
+/* USER CODE END Header_TEST_Thread */
+void TEST_Thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
