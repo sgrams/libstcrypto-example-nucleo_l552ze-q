@@ -41,10 +41,10 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-/* Definitions for testThreadHandl */
-osThreadId_t testThreadHandlHandle;
-const osThreadAttr_t testThreadHandl_attributes = {
-  .name = "testThreadHandl",
+/* Definitions for testThread */
+osThreadId_t testThreadHandle;
+const osThreadAttr_t testThread_attributes = {
+  .name = "testThread",
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 512
 };
@@ -118,8 +118,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of testThreadHandl */
-  testThreadHandlHandle = osThreadNew(TEST_Thread, NULL, &testThreadHandl_attributes);
+  /* creation of testThread */
+  testThreadHandle = osThreadNew(TEST_Thread, NULL, &testThread_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
