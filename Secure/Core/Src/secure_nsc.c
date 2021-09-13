@@ -21,6 +21,14 @@
 #include "main.h"
 #include "secure_nsc.h"
 
+#include <stdio.h>
+
+#include <stdint.h>
+#include <string.h>
+
+#include <stdlib.h>
+
+
 /** @addtogroup STM32L5xx_HAL_Examples
   * @{
   */
@@ -71,10 +79,26 @@ CMSE_NS_ENTRY void SECURE_RegisterCallback(SECURE_CallbackIDTypeDef CallbackId, 
  */
 CMSE_NS_ENTRY
 void
-SECURE_LEDToggle (void)
+SECURE_CryptoSuite (void)
 {
-  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-  printf("securny mrug\n");
+  HAL_GPIO_TogglePin (LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+
+  printf("\r\n");
+  printf("--- SECURE BEGIN ---\r\n");
+  printf("Press button to continue...\r\n");
+  // wait for user to press a button BUT_1
+  while (1) {
+    if (HAL_GPIO_ReadPin (BUT_1_GPIO_Port, BUT_1_Pin) == 1) break;
+  }
+
+  lstcrypto_example_nucleo_l552ze_q_suite (); // run lstcrypto suite
+
+  printf ("--- SECURE END ---\r\n");
+  printf("Press button to continue...\r\n");
+  // wait for user to press a button BUT_1
+  while (1) {
+    if (HAL_GPIO_ReadPin (BUT_1_GPIO_Port, BUT_1_Pin) == 1) break;
+  }
   return;
 }
 

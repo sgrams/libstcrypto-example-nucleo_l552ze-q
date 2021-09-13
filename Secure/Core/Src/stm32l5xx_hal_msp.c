@@ -81,6 +81,17 @@ void HAL_MspInit(void)
   /** Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral
   */
   HAL_PWREx_DisableUCPDDeadBattery();
+  /** PWR Non-Privilege/Non-Secure Items Configurations
+  */
+  HAL_PWR_ConfigAttributes(PWR_WKUP1, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_WKUP2, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_WKUP3, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_WKUP4, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_WKUP5, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_VDM, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_APC, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_LPM, PWR_NSEC |PWR_NPRIV);
+  HAL_PWR_ConfigAttributes(PWR_VB, PWR_NSEC |PWR_NPRIV);
 
   /* USER CODE BEGIN MspInit 1 */
 
@@ -122,6 +133,82 @@ void HAL_HASH_MspDeInit(HASH_HandleTypeDef* hhash)
   /* USER CODE BEGIN HASH_MspDeInit 1 */
 
   /* USER CODE END HASH_MspDeInit 1 */
+
+}
+
+/**
+* @brief UART MSP Initialization
+* This function configures the hardware resources used in this example
+* @param huart: UART handle pointer
+* @retval None
+*/
+void HAL_UART_MspInit(UART_HandleTypeDef* huart)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+  if(huart->Instance==LPUART1)
+  {
+  /* USER CODE BEGIN LPUART1_MspInit 0 */
+
+  /* USER CODE END LPUART1_MspInit 0 */
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LPUART1;
+    PeriphClkInit.Lpuart1ClockSelection = RCC_LPUART1CLKSOURCE_PCLK1;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Peripheral clock enable */
+    __HAL_RCC_LPUART1_CLK_ENABLE();
+
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+    HAL_PWREx_EnableVddIO2();
+    /**LPUART1 GPIO Configuration
+    PG7     ------> LPUART1_TX
+    PG8     ------> LPUART1_RX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF8_LPUART1;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN LPUART1_MspInit 1 */
+
+  /* USER CODE END LPUART1_MspInit 1 */
+  }
+
+}
+
+/**
+* @brief UART MSP De-Initialization
+* This function freeze the hardware resources used in this example
+* @param huart: UART handle pointer
+* @retval None
+*/
+void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
+{
+  if(huart->Instance==LPUART1)
+  {
+  /* USER CODE BEGIN LPUART1_MspDeInit 0 */
+
+  /* USER CODE END LPUART1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_LPUART1_CLK_DISABLE();
+
+    /**LPUART1 GPIO Configuration
+    PG7     ------> LPUART1_TX
+    PG8     ------> LPUART1_RX
+    */
+    HAL_GPIO_DeInit(GPIOG, GPIO_PIN_7|GPIO_PIN_8);
+
+  /* USER CODE BEGIN LPUART1_MspDeInit 1 */
+
+  /* USER CODE END LPUART1_MspDeInit 1 */
+  }
 
 }
 

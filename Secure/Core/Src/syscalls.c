@@ -40,6 +40,9 @@ extern int __io_getchar(void) __attribute__((weak));
 char *__env[1] = { 0 };
 char **environ = __env;
 
+/* uart comms */
+extern UART_HandleTypeDef hlpuart1;
+
 
 /* Functions */
 void initialise_monitor_handles()
@@ -72,11 +75,26 @@ __attribute__((weak)) int _read(int file, char *ptr, int len)
 		*ptr++ = __io_getchar();
 	}
 
-return len;
+	return len;
+	/*
+
+	  HAL_StatusTypeDef hstatus;
+
+	  if (file == STDIN_FILENO) {
+	    hstatus = HAL_UART_Receive (gHuart, (uint8_t *) ptr, 1, HAL_MAX_DELAY);
+	    if (hstatus == HAL_OK)
+	      return 1;
+	    else
+	      return EIO;
+	  }
+	  errno = EBADF;
+	  return -1;
+	  */
 }
 
 __attribute__((weak)) int _write(int file, char *ptr, int len)
 {
+	/*
 	int DataIdx;
 
 	for (DataIdx = 0; DataIdx < len; DataIdx++)
@@ -85,11 +103,20 @@ __attribute__((weak)) int _write(int file, char *ptr, int len)
 		ITM_SendChar((*ptr++)); // sends character using SWV ITM data mechanism
 	}
 	return len;
+	*/
+
+	HAL_StatusTypeDef hstatus;
+	hstatus = HAL_UART_Transmit (&hlpuart1, (uint8_t *) ptr, len, HAL_MAX_DELAY);
+	if (hstatus == HAL_OK)
+	  return len;
+	else
+	  return EIO;
 }
 
 int _close(int file)
 {
 	return -1;
+
 }
 
 
