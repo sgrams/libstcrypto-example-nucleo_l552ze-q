@@ -91,7 +91,8 @@ SECURE_CryptoSuite (void)
     if (HAL_GPIO_ReadPin (BUT_1_GPIO_Port, BUT_1_Pin) == 1) break;
   }
 
-  lstcrypto_example_nucleo_l552ze_q_suite (); // run lstcrypto suite
+  //lstcrypto_example_nucleo_l552ze_q_suite (); // run lstcrypto suite
+  embedded_example_nucleo_l552ze_q_suite ();
 
   printf ("--- SECURE END ---\r\n");
   printf("Press button to continue...\r\n");

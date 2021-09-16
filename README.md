@@ -40,7 +40,7 @@ The flash of the target (512 KB) is split into two halves (each 256 KB sized) fo
 TBC
 
 ## Debug messages
-All debug messages use either SWV ITM (Serial Wire Viewer Instruction Trace Module) or integrated USART interface. \
+All debug messages use SWV ITM (Serial Wire Viewer Instruction Trace Module). \
 This is achieved by `_write` function overloading (weak attribute). \
 See `(Secure|NonSecure)/Core/Src/syscall.c` for the actual implementation.
 
@@ -50,5 +50,4 @@ This example project provides following use cases of **libstcrypto** library:
 - TBC
 
 ---
-Stanislaw Grams \
-<stanislawgrams@gmail.com>
+Stanislaw Grams ® <stanislawgrams@gmail.com>
