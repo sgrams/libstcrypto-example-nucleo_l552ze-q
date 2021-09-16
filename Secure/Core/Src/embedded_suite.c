@@ -14,6 +14,7 @@
 #include <stcrypto-test.h>
 
 #include <mbedtls/aes.h>
+#include <mbedtls/chacha20.h>
 
 #include "stm32l5xx_hal.h"
 #include "core_cm33.h"
@@ -42,21 +43,27 @@ benchmark_aes256_block (
 {
   lstcrypto_status_t status = C_OK;
 
-  static mbedtls_aes_context aes;
+  static mbedtls_aes_xts_context aes;
   static uint8_t key[32];
   static uint8_t iv[16];
 
   __fill_data (key, 32);
   __fill_data (iv, 16);
 
+  if (m_debug) printf ("F [%s] BEGIN\r\n", __FUNCTION__);
+
   *time   = __tm ();
   *cycles = __cm ();
 
-  mbedtls_aes_setkey_enc (&aes, key, 256);
-  mbedtls_aes_crypt_cbc (&aes, MBEDTLS_AES_ENCRYPT, 48, iv, src, dst);
+  mbedtls_aes_xts_setkey_enc (&aes, key, 256);
+  mbedtls_aes_xts_init (&aes);
+  mbedtls_aes_crypt_xts(&aes, MBEDTLS_AES_ENCRYPT, &length, iv, src, dst);
+  mbedtls_aes_xts_free (&aes);
 
   *time   = __tm () - *time;
   *cycles = __cm () - *cycles;
+
+  if (m_debug) printf ("F [%s] END\r\n", __FUNCTION__);
 
   return status;
 }
@@ -207,13 +214,13 @@ handle_embedded_benchmark (
     printf ("----------------------------------------------------\r\n");
     printf ("BLOCK LENGTH: %i, ROUNDS: %i\r\n", bs, rounds);
     printf ("----------------------------------------------------\r\n");
-    printf ("SHA256:\r\n");
-    printf ("    Avg time of execution: 0x%08x%08x\r\n", (uint32_t)(time[1] >> 32), (uint32_t)time[1]);
-    printf ("    Avg no. of cycles: 0x%08x%08x\r\n", (uint32_t)(cycles[1] >> 32), (uint32_t)cycles[1]);
-    printf ("----------------------------------------------------\r\n");
     printf ("AES256:\r\n");
-    printf ("    Avg time of execution: 0x%08x%08x\r\n", (uint32_t)(time[0] >> 32), (uint32_t)time[0]);
-    printf ("    Avg no. of cycles: 0x%08x%08x\r\n", (uint32_t)(cycles[0] >> 32), (uint32_t)cycles[0]);
+    printf ("    Avg time of execution: 0x%08x%08x\r\n", (uint32_t)(time[0] >> 32), (uint32_t)time[1]);
+    printf ("    Avg no. of cycles: 0x%08x%08x\r\n", (uint32_t)(cycles[0] >> 32), (uint32_t)cycles[1]);
+    printf ("----------------------------------------------------\r\n");
+    printf ("SHA256:\r\n");
+    printf ("    Avg time of execution: 0x%08x%08x\r\n", (uint32_t)(time[1] >> 32), (uint32_t)time[0]);
+    printf ("    Avg no. of cycles: 0x%08x%08x\r\n", (uint32_t)(cycles[1] >> 32), (uint32_t)cycles[0]);
     printf ("----------------------------------------------------\r\n");
   }
 
@@ -223,6 +230,103 @@ handle_embedded_benchmark (
 exit:
   return status;
 }
+
+lstcrypto_status_t
+handle_embedded_benchmark_pp_aes256 (
+  uint64_t bs
+  )
+{
+  lstcrypto_status_t status = C_OK;
+
+  uint8_t  *dst   = NULL;
+  uint8_t  *src   = NULL;
+
+  static mbedtls_aes_xts_context aes;
+  static uint8_t key[32];
+  static uint8_t iv[16];
+
+  if (m_debug) printf ("F [%s] BEGIN\r\n", __FUNCTION__);
+
+  // allocate blocks of a given bs
+  dst = realloc (dst, bs);
+  src = realloc (src, bs);
+
+  // fill the src with random data
+  status = __fill_data (src, bs);
+  if (CRYPTO_ERROR (status)) {
+    printf ("Unable to fill the block with random data!\r\n");
+    goto exit;
+  }
+  status = __fill_data (key, sizeof (key));
+  if (CRYPTO_ERROR (status)) {
+    printf ("Unable to fill the key block with random data!\r\n");
+    goto exit;
+  }
+  status = __fill_data (iv, sizeof (iv));
+  if (CRYPTO_ERROR (status)) {
+    printf ("Unable to fill the iv block with random data!\r\n");
+    goto exit;
+  }
+
+  printf ("Performing AES-XTS 256 infinite loop!\r\n");
+  while (1 < 2) {
+    mbedtls_aes_xts_setkey_enc (&aes, key, 256);
+    mbedtls_aes_xts_init (&aes);
+    mbedtls_aes_crypt_xts(&aes, MBEDTLS_AES_ENCRYPT, &bs, iv, src, dst);
+    mbedtls_aes_xts_free (&aes);
+  }
+
+  if (m_debug) printf ("F [%s] END\r\n", __FUNCTION__);
+
+  if (src) {
+    free (src);
+  }
+
+  if (dst) {
+    free (dst);
+  }
+
+exit:
+  return status;
+}
+
+lstcrypto_status_t
+handle_embedded_benchmark_pp_sha256 (
+  uint64_t bs
+  )
+{
+  lstcrypto_status_t status = C_OK;
+
+  uint8_t *src = NULL;
+
+  if (m_debug) printf ("F [%s] BEGIN\r\n", __FUNCTION__);
+
+  // allocate block of a given bs
+  src = realloc (src, bs);
+
+  // fill the src with random data
+  status = __fill_data (src, bs);
+  if (CRYPTO_ERROR (status)) {
+    printf ("Unable to fill the block with random data!\r\n");
+    goto exit;
+  }
+
+  printf ("Performing SHA 256 infinite loop!\r\n");
+  while (1 < 2) {
+	  HAL_HASH_Init (&hhash);
+	  status = (lstcrypto_status_t)HAL_HASHEx_SHA256_Start (&hhash, src, bs, m_ht, HAL_MAX_DELAY);
+  }
+
+  if (m_debug) printf ("F [%s] END\r\n", __FUNCTION__);
+
+  if (src) {
+    free (src);
+  }
+
+exit:
+  return status;
+}
+
 
 lstcrypto_status_t
 embedded_example_nucleo_l552ze_q_suite (
@@ -238,19 +342,18 @@ embedded_example_nucleo_l552ze_q_suite (
   //
   // configuration
   handle_embedded_debug ();
-
+/*
   // benchmark
   status = handle_embedded_benchmark ();
   if (CRYPTO_ERROR (status)) {
     goto exit;
   }
-/*
+*/
   // power performance
   //HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-  //status = handle_sc_benchmark_pp_chacha20 (1024*32);
-  //status = handle_sc_benchmark_pp_grain128a (1024*32);
-  status = handle_sc_benchmark_pp_trivium (1024*32);
-*/
+  //status = handle_embedded_benchmark_pp_aes256 (1024*32);
+  status = handle_embedded_benchmark_pp_sha256 (1024*32);
+
   printf ("[%s] END (%02x)\r\n", __FILE__, status);
 
 exit:
