@@ -341,7 +341,7 @@ embedded_example_nucleo_l552ze_q_suite (
   // embedded tests
   //
   // configuration
-  handle_embedded_debug ();
+  //handle_embedded_debug ();
 /*
   // benchmark
   status = handle_embedded_benchmark ();
@@ -351,8 +351,14 @@ embedded_example_nucleo_l552ze_q_suite (
 */
   // power performance
   //HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+
+  //status = handle_embedded_benchmark_pp_aes256 (1024*8);
+  //status = handle_embedded_benchmark_pp_aes256 (1024*16);
   //status = handle_embedded_benchmark_pp_aes256 (1024*32);
-  status = handle_embedded_benchmark_pp_sha256 (1024*32);
+
+  status = handle_embedded_benchmark_pp_sha256 (1024*8);
+  //status = handle_embedded_benchmark_pp_sha256 (1024*16);
+  //status = handle_embedded_benchmark_pp_sha256 (1024*32);
 
   printf ("[%s] END (%02x)\r\n", __FILE__, status);
 
